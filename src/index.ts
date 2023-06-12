@@ -1,5 +1,3 @@
-type Operator = "+" | "-" | "*" | "/" | "MOD" | "NEGATE";
-
 export function isOperator(token: string): boolean {
     return ["+", "-", "*", "/", "MOD", "NEGATE"].includes(token);
 }
@@ -36,4 +34,17 @@ export function parseRPN(expression: string): string[] {
     return parsedTokens;
 }
 
-
+export function performOperation(operator: string, operand1: number, operand2: number): number {
+    switch (operator) {
+        case '+':
+            return operand1 + operand2;
+        case '-':
+            return operand1 - operand2;
+        case '*':
+            return operand1 * operand2;
+        case '/':
+            return operand1 / operand2;
+        default:
+            throw new Error('Invalid operator: ' + operator);
+    }
+}

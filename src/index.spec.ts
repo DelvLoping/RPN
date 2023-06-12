@@ -4,7 +4,7 @@ import fc from "fast-check";
 
 expect.extend(matchers);
 
-import { isOperator, isValidNumber, parseRPN } from "./index";
+import { isOperator, isValidNumber, parseRPN, performOperation } from "./index";
 
 
 describe('isOperator', () => {
@@ -63,3 +63,15 @@ describe("parseRPN", () => {
   });
 });
 
+describe("performOperation", () => {
+  it("should perform valid operations correctly", () => {
+    expect(performOperation("+", 3, 4)).toEqual(7);
+    expect(performOperation("-", 6, 2)).toEqual(4);
+    expect(performOperation("*", 5, 3)).toEqual(15);
+    expect(performOperation("/", 10, 2)).toEqual(5);
+  });
+
+  it("should throw an error for invalid operator", () => {
+    expect(() => performOperation("?", 5, 2)).toThrow("Invalid operator: ?");
+  });
+});
