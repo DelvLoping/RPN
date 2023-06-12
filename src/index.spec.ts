@@ -4,7 +4,7 @@ import fc from "fast-check";
 
 expect.extend(matchers);
 
-import { isOperator } from "./index";
+import { isOperator, isValidNumber } from "./index";
 
 
 describe('isOperator', () => {
@@ -25,5 +25,21 @@ describe('isOperator', () => {
     expect(isOperator("divide")).toBe(false);
     expect(isOperator("modulus")).toBe(false);
     expect(isOperator("negate")).toBe(false);
+  });
+});
+
+describe("isValidNumber", () => {
+  it("should return true for valid positive numbers", () => {
+    expect(isValidNumber("10")).toBe(true);
+    expect(isValidNumber("3.14")).toBe(true);
+    expect(isValidNumber("0")).toBe(true);
+  });
+
+  it("should return false for invalid numbers or negative numbers", () => {
+    expect(isValidNumber("-5")).toBe(false);
+    expect(isValidNumber("abc")).toBe(false);
+    expect(isValidNumber("1a")).toBe(false);
+    expect(isValidNumber("10.3.5")).toBe(false);
+    expect(isValidNumber("")).toBe(false);
   });
 });
