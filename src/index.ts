@@ -44,7 +44,30 @@ export function performOperation(operator: string, operand1: number, operand2: n
             return operand1 * operand2;
         case '/':
             return operand1 / operand2;
+        case 'MOD':
+            return operand1 % operand2;
+        case 'NEGATE':
+            return -operand2;
         default:
             throw new Error('Invalid operator: ' + operator);
     }
+}
+
+
+export function rpn(expression: string): number {
+    const tokens = parseRPN(expression);
+    const stack: number[] = [];
+
+    for (const token of tokens) {
+        if (isValidNumber(token)) {
+            stack.push(Number(token));
+        } else if (isOperator(token)) {
+            const operand2 = stack.pop();
+            const operand1 = stack.pop();
+            const result = performOperation(token, operand1, operand2);
+            stack.push(result);
+        }
+    }
+
+    return stack.pop();
 }

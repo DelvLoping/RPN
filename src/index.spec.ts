@@ -4,7 +4,7 @@ import fc from "fast-check";
 
 expect.extend(matchers);
 
-import { isOperator, isValidNumber, parseRPN, performOperation } from "./index";
+import { isOperator, isValidNumber, parseRPN, performOperation, rpn } from "./index";
 
 
 describe('isOperator', () => {
@@ -69,9 +69,30 @@ describe("performOperation", () => {
     expect(performOperation("-", 6, 2)).toEqual(4);
     expect(performOperation("*", 5, 3)).toEqual(15);
     expect(performOperation("/", 10, 2)).toEqual(5);
+    expect(performOperation("MOD", 10, 2)).toEqual(0);
+    expect(performOperation("NEGATE", null, 2)).toEqual(-2);
   });
 
   it("should throw an error for invalid operator", () => {
     expect(() => performOperation("?", 5, 2)).toThrow("Invalid operator: ?");
+  });
+});
+
+describe("rpn", () => {
+  it("should evaluate valid RPN expressions correctly", () => {
+    expect(rpn("10 3 2 - -")).toEqual(9);
+    expect(rpn("10 3 - 2 -")).toEqual(5);
+    expect(rpn("1 1 +")).toEqual(2);
+    expect(rpn("4 3 MOD")).toEqual(1);
+    expect(rpn("1 NEGATE")).toEqual(-1);
+    expect(rpn("1 2 + NEGATE")).toEqual(-3);
+    expect(rpn("2")).toEqual(2);
+  });
+
+  it("should throw an error for invalid RPN expressions", () => {
+    expect(() => rpn("1 -1 +")).toThrow("Invalid expression");
+    expect(() => rpn("1 - -")).toThrow("Invalid expression");
+    expect(() => rpn("10 *")).toThrow("Invalid expression");
+    expect(() => rpn("abc 5 +")).toThrow("Invalid expression");
   });
 });
