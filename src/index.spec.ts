@@ -4,7 +4,7 @@ import fc from "fast-check";
 
 expect.extend(matchers);
 
-import { isOperator, isValidNumber, parseRPN, performOperation, rpn } from "./index";
+import { isOperator, isValidNumber, parseRPNExpression, isOperationDivisonByZero, performOperation, rpn } from "./index";
 
 
 describe('isOperator', () => {
@@ -44,24 +44,41 @@ describe("isValidNumber", () => {
   });
 });
 
-describe("parseRPN", () => {
+describe("parseRPNExpression", () => {
   it("should parse valid RPN expression correctly", () => {
-    expect(parseRPN("10 3 2 - -")).toEqual(["10", "3", "2", "-", "-"]);
-    expect(parseRPN("10 3 - 2 -")).toEqual(["10", "3", "-", "2", "-"]);
-    expect(parseRPN("1 1 +")).toEqual(["1", "1", "+"]);
-    expect(parseRPN("4 3 MOD")).toEqual(["4", "3", "MOD"]);
-    expect(parseRPN("1 NEGATE")).toEqual(["1", "NEGATE"]);
-    expect(parseRPN("1 2 + NEGATE")).toEqual(["1", "2", "+", "NEGATE"]);
-    expect(parseRPN("2")).toEqual(["2"]);
+    expect(parseRPNExpression("10 3 2 - -")).toEqual(["10", "3", "2", "-", "-"]);
+    expect(parseRPNExpression("10 3 - 2 -")).toEqual(["10", "3", "-", "2", "-"]);
+    expect(parseRPNExpression("1 1 +")).toEqual(["1", "1", "+"]);
+    expect(parseRPNExpression("4 3 MOD")).toEqual(["4", "3", "MOD"]);
+    expect(parseRPNExpression("1 NEGATE")).toEqual(["1", "NEGATE"]);
+    expect(parseRPNExpression("1 2 + NEGATE")).toEqual(["1", "2", "+", "NEGATE"]);
+    expect(parseRPNExpression("2")).toEqual(["2"]);
   });
 
   it("should throw an error for invalid RPN expression", () => {
-    expect(() => parseRPN("1 -1 +")).toThrow("Invalid expression");
-    expect(() => parseRPN("1 - -")).toThrow("Invalid expression");
-    expect(() => parseRPN("10 *")).toThrow("Invalid expression");
-    expect(() => parseRPN("abc 5 +")).toThrow("Invalid expression");
+    expect(() => parseRPNExpression("1 -1 +")).toThrow("Invalid expression");
+    expect(() => parseRPNExpression("1 - -")).toThrow("Invalid expression");
+    expect(() => parseRPNExpression("10 *")).toThrow("Invalid expression");
+    expect(() => parseRPNExpression("abc 5 +")).toThrow("Invalid expression");
   });
 });
+
+describe('isOperationDivisonByZero', () => {
+  it('should return true for valid operations', () => {
+    expect(isOperationDivisonByZero('+', 5, 2)).toBe(true);
+    expect(isOperationDivisonByZero('-', 8, 3)).toBe(true);
+    expect(isOperationDivisonByZero('*', 4, 6)).toBe(true);
+    expect(isOperationDivisonByZero('/', 10, 2)).toBe(true);
+    expect(isOperationDivisonByZero('MOD', 7, 4)).toBe(true);
+    expect(isOperationDivisonByZero('NEGATE', 0, 5)).toBe(true);
+  });
+
+  it('should return false for division by zero', () => {
+    expect(isOperationDivisonByZero('/', 10, 0)).toBe(false);
+    expect(isOperationDivisonByZero('MOD', 7, 0)).toBe(false);
+  });
+});
+
 
 describe("performOperation", () => {
   it("should perform valid operations correctly", () => {
@@ -94,5 +111,6 @@ describe("rpn", () => {
     expect(() => rpn("1 - -")).toThrow("Invalid expression");
     expect(() => rpn("10 *")).toThrow("Invalid expression");
     expect(() => rpn("abc 5 +")).toThrow("Invalid expression");
+    expect(() => rpn("1 0 /")).toThrow("Invalid operation division by 0");
   });
 });

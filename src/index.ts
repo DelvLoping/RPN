@@ -6,7 +6,7 @@ export function isValidNumber(token: string): boolean {
     return /^[0-9]+(\.[0-9]+)?$/.test(token);
 }
 
-export function parseRPN(expression: string): string[] {
+export function parseRPNExpression(expression: string): string[] {
     const tokens = expression.split(" ");
     const parsedTokens: string[] = [];
     let nbNumber = 0;
@@ -34,28 +34,45 @@ export function parseRPN(expression: string): string[] {
     return parsedTokens;
 }
 
-export function performOperation(operator: string, operand1: number, operand2: number): number {
+export function isOperationDivisonByZero(operator: string, operand1: number, operand2: number): boolean {
     switch (operator) {
-        case '+':
-            return operand1 + operand2;
-        case '-':
-            return operand1 - operand2;
-        case '*':
-            return operand1 * operand2;
         case '/':
-            return operand1 / operand2;
+            return operand2 !== 0;
         case 'MOD':
-            return operand1 % operand2;
-        case 'NEGATE':
-            return -operand2;
+            return operand2 !== 0;
         default:
-            throw new Error('Invalid operator: ' + operator);
+            return true;
+    }
+}
+
+export function performOperation(operator: string, operand1: number, operand2: number): number {
+
+    if (isOperationDivisonByZero(operator, operand1, operand2)) {
+
+        switch (operator) {
+            case '+':
+                return operand1 + operand2;
+            case '-':
+                return operand1 - operand2;
+            case '*':
+                return operand1 * operand2;
+            case '/':
+                return operand1 / operand2;
+            case 'MOD':
+                return operand1 % operand2;
+            case 'NEGATE':
+                return -operand2;
+            default:
+                throw new Error('Invalid operator: ' + operator);
+        }
+    } else {
+        throw new Error('Invalid operation division by 0');
     }
 }
 
 
 export function rpn(expression: string): number {
-    const tokens = parseRPN(expression);
+    const tokens = parseRPNExpression(expression);
     const stack: number[] = [];
 
     for (const token of tokens) {
