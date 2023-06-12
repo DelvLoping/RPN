@@ -1,5 +1,11 @@
-export function isOperator(token: string): boolean {
-    return ["+", "-", "*", "/", "MOD", "NEGATE"].includes(token);
+type BinaryOperator = "+" | "-" | "*" | "/" | "MOD";
+type UnaryOperator = "NEGATE";
+export function isBinaryOperator(token: string): token is BinaryOperator {
+    return ["+", "-", "*", "/", "MOD"].includes(token);
+}
+
+export function isUnaryOperator(token: string): token is UnaryOperator {
+    return ["NEGATE"].includes(token);
 }
 
 export function isValidNumber(token: string): boolean {
@@ -7,25 +13,26 @@ export function isValidNumber(token: string): boolean {
 }
 
 export function validateTokens(tokens: string[]): void {
+    const errorMessageInvalidExpression = "Invalid expression";
     let numberCount = 0;
     let operatorCount = 0;
 
     for (const token of tokens) {
-        if ((isOperator(token) && (numberCount > 1 || token === "NEGATE")) || isValidNumber(token)) {
+        if ((isBinaryOperator(token) && (numberCount > 1)) || isValidNumber(token) || isUnaryOperator(token)) {
             if (isValidNumber(token)) {
                 numberCount++;
             }
 
-            if (isOperator(token) && token !== "NEGATE") {
+            if (isBinaryOperator(token)) {
                 operatorCount++;
             }
         } else {
-            throw new Error("Invalid expression");
+            throw new Error(errorMessageInvalidExpression);
         }
     }
 
     if (numberCount - operatorCount !== 1) {
-        throw new Error("Invalid expression");
+        throw new Error(errorMessageInvalidExpression);
     }
 }
 
@@ -46,7 +53,8 @@ export function isOperationDivisionByZero(operator: string, operand1: number, op
     }
 }
 
-export function performOperation(operator: string, operand1: number, operand2: number): number {
+
+export function performBinaryOperation(operator: string, operand1: number, operand2: number): number {
 
     if (isOperationDivisionByZero(operator, operand1, operand2)) {
 
@@ -61,8 +69,6 @@ export function performOperation(operator: string, operand1: number, operand2: n
                 return operand1 / operand2;
             case 'MOD':
                 return operand1 % operand2;
-            case 'NEGATE':
-                return -operand2;
             default:
                 throw new Error('Invalid operator: ' + operator);
         }
@@ -71,20 +77,38 @@ export function performOperation(operator: string, operand1: number, operand2: n
     }
 }
 
+export function performUnaryOperation(operator: string, operand: number): number {
+    if (operand === 0) {
+        return 0;
+    }
+    switch (operator) {
+        case 'NEGATE':
+            return -operand;
+        default:
+            throw new Error('Invalid operator: ' + operator);
+    }
+
+}
+
 
 export function rpn(expression: string): number {
-    console.log(expression)
     const tokens = parseRPNExpression(expression);
     const stack: number[] = [];
 
     for (const token of tokens) {
         if (isValidNumber(token)) {
             stack.push(Number(token));
-        } else if (isOperator(token)) {
+        } else if (isBinaryOperator(token)) {
             const operand2 = stack.pop();
             const operand1 = stack.pop();
-            const result = performOperation(token, operand1, operand2);
+            const result = performBinaryOperation(token, operand1, operand2);
             stack.push(result);
+
+        } else if (isUnaryOperator(token)) {
+            const operand = stack.pop();
+            const result = performUnaryOperation(token, operand);
+            stack.push(result);
+
         }
     }
 
