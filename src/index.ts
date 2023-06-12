@@ -6,35 +6,36 @@ export function isValidNumber(token: string): boolean {
     return /^[0-9]+(\.[0-9]+)?$/.test(token);
 }
 
-export function parseRPNExpression(expression: string): string[] {
-    const tokens = expression.split(" ");
-    const parsedTokens: string[] = [];
-    let nbNumber = 0;
-    let nbOperator = 0;
+export function validateTokens(tokens: string[]): void {
+    let numberCount = 0;
+    let operatorCount = 0;
 
     for (const token of tokens) {
-        if (isOperator(token) || isValidNumber(token)) {
+        if ((isOperator(token) && (numberCount > 1 || token === "NEGATE")) || isValidNumber(token)) {
+            if (isValidNumber(token)) {
+                numberCount++;
+            }
 
-            if (isValidNumber(token))
-                nbNumber++;
-
-            if (isOperator(token) && token !== "NEGATE")
-                nbOperator++;
-
-            parsedTokens.push(token);
+            if (isOperator(token) && token !== "NEGATE") {
+                operatorCount++;
+            }
         } else {
             throw new Error("Invalid expression");
         }
     }
 
-    if (nbNumber - nbOperator !== 1) {
+    if (numberCount - operatorCount !== 1) {
         throw new Error("Invalid expression");
     }
-
-    return parsedTokens;
 }
 
-export function isOperationDivisonByZero(operator: string, operand1: number, operand2: number): boolean {
+export function parseRPNExpression(expression: string): string[] {
+    const tokens = expression.split(" ");
+    validateTokens(tokens);
+    return tokens;
+}
+
+export function isOperationDivisionByZero(operator: string, operand1: number, operand2: number): boolean {
     switch (operator) {
         case '/':
             return operand2 !== 0;
@@ -47,7 +48,7 @@ export function isOperationDivisonByZero(operator: string, operand1: number, ope
 
 export function performOperation(operator: string, operand1: number, operand2: number): number {
 
-    if (isOperationDivisonByZero(operator, operand1, operand2)) {
+    if (isOperationDivisionByZero(operator, operand1, operand2)) {
 
         switch (operator) {
             case '+':
@@ -72,6 +73,7 @@ export function performOperation(operator: string, operand1: number, operand2: n
 
 
 export function rpn(expression: string): number {
+    console.log(expression)
     const tokens = parseRPNExpression(expression);
     const stack: number[] = [];
 
