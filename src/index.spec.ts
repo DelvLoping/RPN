@@ -4,29 +4,26 @@ import fc from "fast-check";
 
 expect.extend(matchers);
 
-test("A simple test (Jest)", () => {
-  expect(1 + 1).toEqual(2);
-});
+import { isOperator } from "./index";
 
-test("Additional matchers (jest-extended)", () => {
-  expect([1, 0]).toIncludeSameMembers([0, 1]);
-});
 
-test("Property-based testing (fast-check)", () => {
-  type Boundaries = {
-    min: number;
-    max: number;
-  };
+describe('isOperator', () => {
+  it('should return true for valid operators', () => {
+    expect(isOperator("+")).toBe(true);
+    expect(isOperator("-")).toBe(true);
+    expect(isOperator("*")).toBe(true);
+    expect(isOperator("/")).toBe(true);
+    expect(isOperator("MOD")).toBe(true);
+    expect(isOperator("NEGATE")).toBe(true);
+  });
 
-  const minmax =
-    ({ min, max }: Boundaries) =>
-    (n: number): number =>
-      Math.min(max, Math.max(min, n));
-
-  fc.assert(
-    fc.property(fc.integer(), (n): boolean => {
-      const result = minmax({ min: 1, max: 10 })(n);
-      return 1 <= result && result <= 10;
-    })
-  );
+  it('should return false for invalid operators', () => {
+    expect(isOperator("")).toBe(false);
+    expect(isOperator("add")).toBe(false);
+    expect(isOperator("subtract")).toBe(false);
+    expect(isOperator("multiply")).toBe(false);
+    expect(isOperator("divide")).toBe(false);
+    expect(isOperator("modulus")).toBe(false);
+    expect(isOperator("negate")).toBe(false);
+  });
 });

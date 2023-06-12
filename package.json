@@ -1,6 +1,7 @@
 {
   "name": "js-kata-starter",
   "version": "1.0.0",
+  "module": "commonjs",
   "description": "Starter project for kata (Node, TypeScript, Jest, fast-check, ts-node)",
   "main": "index.js",
   "scripts": {
