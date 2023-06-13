@@ -94,23 +94,33 @@ export function performUnaryOperation(operator: string, operand: number): number
 export function rpn(expression: string): number {
     const tokens = parseRPNExpression(expression);
     const stack: number[] = [];
+    return recursifRpn(stack, tokens);
+}
 
-    for (const token of tokens) {
-        if (isValidNumber(token)) {
-            stack.push(Number(token));
-        } else if (isBinaryOperator(token)) {
-            const operand2 = stack.pop();
-            const operand1 = stack.pop();
-            const result = performBinaryOperation(token, operand1, operand2);
-            stack.push(result);
+export function recursifRpn(stack: number[], tokens: string[]): number {
 
-        } else if (isUnaryOperator(token)) {
-            const operand = stack.pop();
-            const result = performUnaryOperation(token, operand);
-            stack.push(result);
-
-        }
+    if (tokens.length === 0) {
+        return stack.pop();
     }
 
-    return stack.pop();
+    let token = tokens.shift();
+
+    if (isValidNumber(token)) {
+        stack.push(Number(token));
+    } else if (isBinaryOperator(token)) {
+        const operand2 = stack.pop();
+        const operand1 = stack.pop();
+        const result = performBinaryOperation(token, operand1, operand2);
+        stack.push(result);
+
+    } else if (isUnaryOperator(token)) {
+        const operand = stack.pop();
+        const result = performUnaryOperation(token, operand);
+        stack.push(result);
+
+    }
+
+    return recursifRpn(stack, tokens);
+
+
 }

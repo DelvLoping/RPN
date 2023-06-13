@@ -4,7 +4,7 @@ import fc from "fast-check";
 
 expect.extend(matchers);
 
-import { isBinaryOperator, isUnaryOperator, isValidNumber, validateTokens, parseRPNExpression, isOperationDivisionByZero, performBinaryOperation, performUnaryOperation, rpn } from "./index";
+import { isBinaryOperator, isUnaryOperator, isValidNumber, validateTokens, parseRPNExpression, isOperationDivisionByZero, performBinaryOperation, performUnaryOperation, recursifRpn, rpn } from "./index";
 
 //////////////////////////////////////////////////////////////////////////////   isBinaryOperator  //////////////////////////////////////////////////////////////////////////////
 describe('isBinaryOperator', () => {
@@ -328,6 +328,50 @@ describe("performUnaryOperation", () => {
 
   it("should throw an error for invalid operator 'MOD'", () => {
     expect(() => performUnaryOperation("MOD", 10)).toThrow("Invalid operator: MOD");
+  });
+});
+
+//////////////////////////////////////////////////////////////////////////////   recursifRpn  //////////////////////////////////////////////////////////////////////////////
+
+describe("recursifRpn", () => {
+  it("should evaluate valid recursifRPN expressions correctly - Case 10 3 2 - - ", () => {
+    expect(recursifRpn([], ["10", "3", "2", "-", "-"])).toEqual(9);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 10 3 - 2 -", () => {
+    expect(recursifRpn([], ["10", "3", "-", "2", "-"])).toEqual(5);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 1 1 +", () => {
+    expect(recursifRpn([], ["1", "1", "+"])).toEqual(2);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 4 3 MOD", () => {
+    expect(recursifRpn([], ["4", "3", "MOD"])).toEqual(1);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 1 NEGATE", () => {
+    expect(recursifRpn([], ["1", "NEGATE"])).toEqual(-1);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 1 2 + NEGATE", () => {
+    expect(recursifRpn([], ["1", "2", "+", "NEGATE"])).toEqual(-3);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 2", () => {
+    expect(recursifRpn([], ["2"])).toEqual(2);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 1 2 NEGATE +", () => {
+    expect(recursifRpn([], ["1", "2", "NEGATE", "+"])).toEqual(-1);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 10 2 /", () => {
+    expect(recursifRpn([], ["10", "2", "/"])).toEqual(5);
+  });
+
+  it("should evaluate valid recursifRPN expressions correctly - Case 3 4 * 5 6 * +", () => {
+    expect(recursifRpn([], ["3", "4", "*", "5", "6", "*", "+"])).toEqual(42);
   });
 });
 
