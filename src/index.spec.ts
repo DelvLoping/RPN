@@ -4,7 +4,52 @@ import fc from "fast-check";
 
 expect.extend(matchers);
 
-import { isBinaryOperator, isUnaryOperator, isValidNumber, validateTokens, parseRPNExpression, isOperationDivisionByZero, performBinaryOperation, performUnaryOperation, recursifRpn, rpn } from "./index";
+import { Pile, isBinaryOperator, isUnaryOperator, isValidNumber, validateTokens, parseRPNExpression, isOperationDivisionByZero, performBinaryOperation, performUnaryOperation, recursifRpn, rpn } from "./index";
+
+//////////////////////////////////////////////////////////////////////////////   Pile  //////////////////////////////////////////////////////////////////////////////
+
+describe('Pile', () => {
+  it('should push items onto the pile', () => {
+    const pile = new Pile<number>();
+    const newPile = pile.push(1, 2, 3);
+    expect(newPile.toArray()).toEqual([1, 2, 3]);
+  });
+
+  it('should pop the top item from the pile', () => {
+    const pile = new Pile<number>(1, 2, 3);
+    const newPile = pile.pop();
+    expect(newPile.toArray()).toEqual([1, 2]);
+  });
+
+  it('should throw an error when popping from an empty pile', () => {
+    const pile = new Pile<number>();
+    expect(() => {
+      pile.pop();
+    }).toThrowError('The pile is empty.');
+  });
+
+  it('should check if the pile is empty', () => {
+    const pile1 = new Pile<number>();
+    expect(pile1.isEmpty()).toBe(true);
+  });
+
+  it('should check if the pile is not empty', () => {
+    const pile2 = new Pile<number>(1, 2, 3);
+    expect(pile2.isEmpty()).toBe(false);
+  });
+
+  it('should peek the top item from the pile', () => {
+    const pile = new Pile<number>(1, 2, 3);
+    expect(pile.peek()).toBe(3);
+  });
+
+  it('should peek the top item from the pile without removing it', () => {
+    const pile = new Pile<number>(1, 2, 3);
+    pile.peek();
+    expect(pile.toArray()).toEqual([1, 2, 3]);
+  });
+});
+
 
 //////////////////////////////////////////////////////////////////////////////   isBinaryOperator  //////////////////////////////////////////////////////////////////////////////
 describe('isBinaryOperator', () => {
@@ -335,43 +380,43 @@ describe("performUnaryOperation", () => {
 
 describe("recursifRpn", () => {
   it("should evaluate valid recursifRPN expressions correctly - Case 10 3 2 - - ", () => {
-    expect(recursifRpn([], ["10", "3", "2", "-", "-"])).toEqual(9);
+    expect(recursifRpn(new Pile<number>(), ["10", "3", "2", "-", "-"])).toEqual(9);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 10 3 - 2 -", () => {
-    expect(recursifRpn([], ["10", "3", "-", "2", "-"])).toEqual(5);
+    expect(recursifRpn(new Pile<number>(), ["10", "3", "-", "2", "-"])).toEqual(5);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 1 1 +", () => {
-    expect(recursifRpn([], ["1", "1", "+"])).toEqual(2);
+    expect(recursifRpn(new Pile<number>(), ["1", "1", "+"])).toEqual(2);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 4 3 MOD", () => {
-    expect(recursifRpn([], ["4", "3", "MOD"])).toEqual(1);
+    expect(recursifRpn(new Pile<number>(), ["4", "3", "MOD"])).toEqual(1);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 1 NEGATE", () => {
-    expect(recursifRpn([], ["1", "NEGATE"])).toEqual(-1);
+    expect(recursifRpn(new Pile<number>(), ["1", "NEGATE"])).toEqual(-1);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 1 2 + NEGATE", () => {
-    expect(recursifRpn([], ["1", "2", "+", "NEGATE"])).toEqual(-3);
+    expect(recursifRpn(new Pile<number>(), ["1", "2", "+", "NEGATE"])).toEqual(-3);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 2", () => {
-    expect(recursifRpn([], ["2"])).toEqual(2);
+    expect(recursifRpn(new Pile<number>(), ["2"])).toEqual(2);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 1 2 NEGATE +", () => {
-    expect(recursifRpn([], ["1", "2", "NEGATE", "+"])).toEqual(-1);
+    expect(recursifRpn(new Pile<number>(), ["1", "2", "NEGATE", "+"])).toEqual(-1);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 10 2 /", () => {
-    expect(recursifRpn([], ["10", "2", "/"])).toEqual(5);
+    expect(recursifRpn(new Pile<number>(), ["10", "2", "/"])).toEqual(5);
   });
 
   it("should evaluate valid recursifRPN expressions correctly - Case 3 4 * 5 6 * +", () => {
-    expect(recursifRpn([], ["3", "4", "*", "5", "6", "*", "+"])).toEqual(42);
+    expect(recursifRpn(new Pile<number>(), ["3", "4", "*", "5", "6", "*", "+"])).toEqual(42);
   });
 });
 
